@@ -13,6 +13,7 @@ public enum WeightUnits
     LB = 454,
     OZ = 28
 }
+// Wiem że funty i uncje nie działają ;')
 public class Weight: IEquatable<Weight>, IComparable<Weight>
 {
     public double Value { get; init; }
