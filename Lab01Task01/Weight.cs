@@ -13,18 +13,21 @@ public enum WeightUnits
     LB = 454,
     OZ = 28
 }
-
 public class Weight: IEquatable<Weight>, IComparable<Weight>
 {
-    public readonly double Value;
-    public readonly WeightUnits Unit;
+    public double Value { get; init; }
+    public WeightUnits Unit { get; init; }
 
+    private Weight()
+    {
+        Value = 0;
+        Unit = WeightUnits.G;
+    }
     private Weight(double value, WeightUnits unit)
     {
         Value = value;
         Unit = unit;
     }
-
     public static Weight Of(double value, WeightUnits unit)
     {
         if((value >= 0)&&(Enum.IsDefined(typeof(WeightUnits), unit)))
@@ -34,7 +37,6 @@ public class Weight: IEquatable<Weight>, IComparable<Weight>
         else
         { throw new ArgumentException(); }
     }
-
     public static Weight Parse(string input)
     {
         string[] part = input.Split(' ');
@@ -49,12 +51,10 @@ public class Weight: IEquatable<Weight>, IComparable<Weight>
         { throw new ArgumentException("Ujemna wartość masy!"); }
         return Of(value, unit);
     }
-
     private double ToGram()
     {
         return Value * (double)Unit;
     }
-
     public bool Equals(Weight? other)
     {
         if (ReferenceEquals(null, other)) return false;
@@ -72,38 +72,59 @@ public class Weight: IEquatable<Weight>, IComparable<Weight>
             return firstValue.Equals(secondValue);
         }
     }
-
     public override bool Equals(object obj)
     {
-        if (obj is Weight weight)
-        {
-            return Equals(weight);
-        }
-        return false;
+        return Equals(obj as Weight);
     }
-
     public override int GetHashCode()
     {
         return HashCode.Combine(Value, Unit);
     }
-
-    /*public int CompareTo(Weight? other)
-    {
-        if (ReferenceEquals(this, other)) return 0;
-
-        return 0;
-    }*/
-
     public int CompareTo(Weight other)
     {
-        if (other == null) return 1; // Zgodnie z konwencją, każdy obiekt jest większy niż null
+        if (other == null) return 1; 
 
         double thisInGrams = ToGram();
         double otherInGrams = other.ToGram();
 
-        if (thisInGrams > otherInGrams) return 1; // obiekt jest większy
-        if (thisInGrams < otherInGrams) return -1; // obiekt jest mniejszy
+        if (thisInGrams > otherInGrams) return 1; 
+        if (thisInGrams < otherInGrams) return -1; 
 
-        return 0; // obiekty są równe
+        return 0; 
+    }
+    // Operator większy >
+    public static bool operator >(Weight left, Weight right)
+    {
+        return left.CompareTo(right) > 0;
+    }
+    // Oprator mniejszy <
+    public static bool operator <(Weight left, Weight right)
+    {
+        return left.CompareTo(right) < 0;
+    }
+    // Operator większy lub równy >=
+    public static bool operator >=(Weight left, Weight right)
+    {
+        return left.CompareTo(right) >= 0;
+    }
+    // Operator mniejszy lub równy <=
+    public static bool operator <=(Weight left, Weight right)
+    {
+        return left.CompareTo(right) <= 0;
+    }
+    // Operator równy ==
+    public static bool operator ==(Weight left, Weight right)
+    {
+        if (object.ReferenceEquals(left, null))
+        {
+            return object.ReferenceEquals(right, null);
+        }
+
+        return left.Equals(right);
+    }
+    // Operator różny !=
+    public static bool operator !=(Weight left, Weight right)
+    {
+        return !(left == right);
     }
 }
